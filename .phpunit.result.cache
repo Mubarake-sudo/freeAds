@@ -1,0 +1,1 @@
+{"version":2,"defects":{"Tests\\Feature\\AssetLayoutTest::test_homepage_layout_no_longer_uses_the_legacy_stylesheet":7},"times":{"Tests\\Feature\\AssetLayoutTest::test_homepage_layout_no_longer_uses_the_legacy_stylesheet":0.021,"Tests\\Feature\\AuthRegistrationTest::test_registration_creates_a_user_with_a_name":0.149,"Tests\\Feature\\AuthRegistrationTest::test_example":0.036}}

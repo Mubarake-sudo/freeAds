@@ -3,10 +3,14 @@
 @section('title', 'Modifier mon profil')
 
 @section('content')
+@php
+    $userName = $user->login ?? $user->name ?? $user->email;
+    $initial = strtoupper(substr($userName, 0, 1));
+@endphp
+
 <div class="page-container">
     <div class="container">
         <div class="form-page-layout form-page-sm">
-
             <div class="form-page-header">
                 <nav class="breadcrumb" aria-label="Fil d'Ariane">
                     <a href="{{ route('home') }}">Accueil</a>
@@ -15,7 +19,13 @@
                     <span>›</span>
                     <span>Modifier</span>
                 </nav>
-                <h1 class="page-title">Modifier mon profil</h1>
+                <div class="form-header-grid">
+                    <div>
+                        <h1 class="page-title">Modifier mon profil</h1>
+                        <p class="page-subtitle">Mettez à jour vos informations et gardez votre profil clair et professionnel.</p>
+                    </div>
+                    <span class="user-avatar user-avatar-lg">{{ $initial }}</span>
+                </div>
             </div>
 
             <div class="form-card">
@@ -35,7 +45,7 @@
                     <div class="form-group">
                         <label for="email" class="form-label">Email</label>
                         <input type="email" id="email" value="{{ $user->email }}" class="form-input" disabled>
-                        <p class="form-hint">L'email ne peut pas être modifié pour des raisons de sécurité.</p>
+                        <p class="form-hint">L'adresse email est utilisée pour la connexion et la sécurité du compte.</p>
                     </div>
 
                     <div class="form-group">
@@ -47,13 +57,12 @@
                         @error('phone_number') <p class="form-error">{{ $message }}</p> @enderror
                     </div>
 
-                    <div class="form-actions">
-                        <a href="{{ route('profile') }}" class="btn btn-outline" id="cancel-profile-edit">Annuler</a>
-                        <button type="submit" class="btn btn-primary" id="save-profile">Enregistrer</button>
+                    <div class="form-actions form-actions-right">
+                        <a href="{{ route('profile') }}" class="btn btn-outline">Retour au profil</a>
+                        <button type="submit" class="btn btn-primary">Enregistrer les modifications</button>
                     </div>
                 </form>
             </div>
-
         </div>
     </div>
 </div>

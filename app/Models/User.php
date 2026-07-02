@@ -18,6 +18,7 @@ class User extends Authenticatable implements MustVerifyEmail
      * @var array<int, string>
      */
     protected $fillable = [
+        'name',
         'login',
         'email',
         'password',
@@ -35,17 +36,16 @@ class User extends Authenticatable implements MustVerifyEmail
     ];
 
     /**
-     * Les casts d'attributs.
+     * Les casts d'attributs utilisés par Eloquent.
+     * Le champ is_admin permet de distinguer un compte administrateur.
      *
-     * @return array<string, string>
+     * @var array<string, string>
      */
-    protected function casts(): array
-    {
-        return [
-            'email_verified_at' => 'datetime',
-            'password' => 'hashed',
-        ];
-    }
+    protected $casts = [
+        'email_verified_at' => 'datetime',
+        'password' => 'hashed',
+        'is_admin' => 'boolean',
+    ];
 
     /**
      * Un utilisateur possède plusieurs annonces.

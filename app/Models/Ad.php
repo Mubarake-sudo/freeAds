@@ -59,14 +59,20 @@ class Ad extends Model
     }
 
     /**
-     * Retourne l'URL de la photo ou une image placeholder.
+     * Retourne l'URL de la photo enregistrée.
+     * Si le champ contient une URL complète, on la renvoie directement.
+     * Sinon on utilise le stockage public Laravel.
      */
     public function getPhotoUrlAttribute(): string
     {
         if ($this->photo) {
+            if (str_starts_with($this->photo, 'http://') || str_starts_with($this->photo, 'https://')) {
+                return $this->photo;
+            }
             return asset('storage/' . $this->photo);
         }
-        return 'https://via.placeholder.com/400x300?text=No+Image';
+
+        return 'https://via.placeholder.com/800x600.png?text=FreeAds+Annonce';
     }
 
     /**

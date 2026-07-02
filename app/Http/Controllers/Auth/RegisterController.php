@@ -44,6 +44,7 @@ class RegisterController extends Controller
         ]);
 
         $user = User::create([
+            'name'         => $request->login,
             'login'        => $request->login,
             'email'        => $request->email,
             'phone_number' => $request->phone_number,
@@ -55,7 +56,7 @@ class RegisterController extends Controller
 
         Auth::login($user);
 
-        return redirect()->route('verification.notice')
-            ->with('success', 'Compte créé ! Vérifiez votre email pour activer votre compte.');
+        return redirect()->route('home')
+            ->with('success', 'Compte créé avec succès. Vous pouvez maintenant publier des annonces.');
     }
 }

@@ -18,7 +18,9 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', [AdController::class, 'index'])->name('home');
 
 // Détail d'une annonce (accessible à tous)
-Route::get('/annonces/{ad}', [AdController::class, 'show'])->name('ads.show');
+// NOTE: route for specific ad is registered after the CRUD routes to avoid
+// conflicts with the static `/annonces/creer` route (otherwise {ad} would
+// capture the "creer" slug and return a 404).
 
 /*
 |--------------------------------------------------------------------------
@@ -69,7 +71,7 @@ Route::middleware('auth')->group(function () {
 |--------------------------------------------------------------------------
 */
 
-Route::middleware(['auth', 'verified'])->group(function () {
+Route::middleware(['auth'])->group(function () {
     // Annonces — CRUD
     Route::get('/annonces/creer', [AdController::class, 'create'])->name('ads.create');
     Route::post('/annonces', [AdController::class, 'store'])->name('ads.store');
@@ -83,3 +85,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::put('/profil', [UserController::class, 'update'])->name('profile.update');
     Route::delete('/profil', [UserController::class, 'destroy'])->name('profile.destroy');
 });
+
+// Détail d'une annonce (accessible à tous)
+Route::get('/annonces/{ad}', [AdController::class, 'show'])->name('ads.show');

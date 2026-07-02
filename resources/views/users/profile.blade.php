@@ -3,84 +3,88 @@
 @section('title', 'Mon Profil — ' . $user->login)
 
 @section('content')
+@php
+    $userName = $user->login ?? $user->name ?? $user->email;
+    $initial = strtoupper(substr($userName, 0, 1));
+    $adsCount = $user->ads->count();
+    $newAds = $user->ads->where('condition', 'new')->count();
+    $usedAds = $user->ads->where('condition', 'used')->count();
+@endphp
+
 <div class="page-container">
     <div class="container">
-
-        <div class="profile-layout">
-
-            {{-- Sidebar profil --}}
-            <aside class="profile-sidebar">
-                <div class="profile-card">
-                    <div class="profile-avatar">{{ strtoupper(substr($user->login, 0, 1)) }}</div>
-                    <h2 class="profile-name">{{ $user->login }}</h2>
-                    <p class="profile-email">{{ $user->email }}</p>
-                    @if($user->phone_number)
-                        <p class="profile-phone">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.65 3.12 2 2 0 0 1 3.62 1h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.6a16 16 0 0 0 6.29 6.29l.96-.86a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-                            {{ $user->phone_number }}
-                        </p>
-                    @endif
-                    <p class="profile-since">Membre depuis {{ $user->created_at->format('d/m/Y') }}</p>
+        <div class="profile-page">
+            <div class="profile-top-grid">
+                <section class="profile-card">
+                    <div class="profile-card-head">
+                        <div class="profile-avatar">{{ $initial }}</div>
+                        <div class="profile-details">
+                            <span class="profile-tag">Profil utilisateur</span>
+                            <h1 class="profile-title">{{ $userName }}</h1>
+                            <p class="profile-email">{{ $user->email }}</p>
+                            @if($user->phone_number)
+                                <p class="profile-contact">{{ $user->phone_number }}</p>
+                            @endif
+                            <p class="profile-meta">Membre depuis {{ $user->created_at->format('d/m/Y') }}</p>
+                        </div>
+                    </div>
 
                     @if(!$user->hasVerifiedEmail())
-                        <div class="alert alert-warning mt-2">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-                            Email non vérifié.
-                            <form method="POST" action="{{ route('verification.send') }}" class="inline">
-                                @csrf
-                                <button type="submit" class="link-btn">Renvoyer l'email</button>
-                            </form>
+                        <div class="profile-notice">
+                            <svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                            <div>
+                                <strong>Email non vérifié.</strong>
+                                <p>Vérifiez votre adresse pour publier et gérer vos annonces en toute confiance.</p>
+                            </div>
                         </div>
                     @endif
 
-                    <div class="profile-actions">
-                        <a href="{{ route('profile.edit') }}" class="btn btn-outline btn-block" id="edit-profile">Modifier le profil</a>
+                    <div class="profile-card-actions">
+                        <a href="{{ route('profile.edit') }}" class="btn btn-outline btn-pill">Modifier le profil</a>
+                        <a href="{{ route('ads.create') }}" class="btn btn-primary btn-pill">Publier une annonce</a>
                     </div>
+                </section>
 
-                    <div class="profile-stats">
-                        <div class="profile-stat">
-                            <span class="stat-num">{{ $user->ads->count() }}</span>
-                            <span class="stat-lbl">Annonces</span>
+                <aside class="profile-summary-card">
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <span class="stat-value">{{ $adsCount }}</span>
+                            <span class="stat-label">Annonces publiées</span>
                         </div>
-                        <div class="profile-stat">
-                            <span class="stat-num">{{ $user->ads->where('condition', 'new')->count() }}</span>
-                            <span class="stat-lbl">Neufs</span>
+                        <div class="stat-card">
+                            <span class="stat-value">{{ $newAds }}</span>
+                            <span class="stat-label">Neuves</span>
+                        </div>
+                        <div class="stat-card">
+                            <span class="stat-value">{{ $usedAds }}</span>
+                            <span class="stat-label">Occasions</span>
                         </div>
                     </div>
-                </div>
+                </aside>
+            </div>
 
-                {{-- Suppression du compte --}}
-                <div class="danger-zone">
-                    <h3>Zone de danger</h3>
-                    <button type="button" class="btn btn-danger btn-block btn-sm" onclick="document.getElementById('delete-account-modal').style.display='flex'" id="delete-account-btn">
-                        Supprimer mon compte
-                    </button>
-                </div>
-            </aside>
-
-            {{-- Annonces de l'utilisateur --}}
-            <div class="profile-main">
-                <div class="profile-main-header">
-                    <h2>Mes annonces</h2>
-                    <a href="{{ route('ads.create') }}" class="btn btn-primary" id="profile-post-ad">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-                        Publier
-                    </a>
+            <section class="profile-ads-section">
+                <div class="section-header">
+                    <div>
+                        <p class="section-pretitle">Mes annonces</p>
+                        <h2>Gérez vos annonces</h2>
+                    </div>
+                    <a href="{{ route('ads.create') }}" class="btn btn-primary btn-pill">Publier une annonce</a>
                 </div>
 
                 @if($user->ads->isEmpty())
-                    <div class="empty-state">
+                    <div class="empty-state empty-state-profile">
                         <div class="empty-icon">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                            <svg class="icon-xl" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
                         </div>
                         <h3>Aucune annonce publiée</h3>
-                        <p>Publiez votre première annonce gratuitement !</p>
-                        <a href="{{ route('ads.create') }}" class="btn btn-primary">Publier une annonce</a>
+                        <p>Publiez votre première annonce gratuitement et atteignez des acheteurs locaux.</p>
+                        <a href="{{ route('ads.create') }}" class="btn btn-primary btn-pill">Publier une annonce</a>
                     </div>
                 @else
-                    <div class="my-ads-list">
+                    <div class="my-ads-grid">
                         @foreach($user->ads->sortByDesc('created_at') as $ad)
-                            <div class="my-ad-card" id="my-ad-{{ $ad->id }}">
+                            <article class="my-ad-card" id="my-ad-{{ $ad->id }}">
                                 <div class="my-ad-image">
                                     <img src="{{ $ad->photo_url }}" alt="{{ $ad->title }}" loading="lazy">
                                 </div>
@@ -89,33 +93,39 @@
                                         <span class="ad-category-tag">{{ $ad->category }}</span>
                                         <span class="ad-condition-badge ad-condition-{{ $ad->condition }}">{{ $ad->condition_label }}</span>
                                     </div>
-                                    <h3 class="my-ad-title">
-                                        <a href="{{ route('ads.show', $ad) }}">{{ $ad->title }}</a>
-                                    </h3>
+                                    <h3 class="my-ad-title"><a href="{{ route('ads.show', $ad) }}">{{ $ad->title }}</a></h3>
                                     <div class="my-ad-meta">
                                         <span class="ad-price">{{ number_format($ad->price, 0, ',', ' ') }} FCFA</span>
                                         <span class="ad-location">
-                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                                            <svg class="icon-xs" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
                                             {{ $ad->location }}
                                         </span>
-                                        <time class="ad-date">{{ $ad->created_at->diffForHumans() }}</time>
+                                    </div>
+                                    <div class="my-ad-actions">
+                                        <a href="{{ route('ads.edit', $ad) }}" class="btn btn-outline btn-sm">Modifier</a>
+                                        <form method="POST" action="{{ route('ads.destroy', $ad) }}" onsubmit="return confirm('Supprimer cette annonce ?')">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="btn btn-danger btn-sm">Supprimer</button>
+                                        </form>
                                     </div>
                                 </div>
-                                <div class="my-ad-actions">
-                                    <a href="{{ route('ads.edit', $ad) }}" class="btn btn-outline btn-sm" id="edit-my-ad-{{ $ad->id }}">Modifier</a>
-                                    <form method="POST" action="{{ route('ads.destroy', $ad) }}" onsubmit="return confirm('Supprimer cette annonce ?')">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" class="btn btn-danger btn-sm" id="delete-my-ad-{{ $ad->id }}">Supprimer</button>
-                                    </form>
-                                </div>
-                            </div>
+                            </article>
                         @endforeach
                     </div>
                 @endif
-            </div>
-        </div>
+            </section>
 
+            <section class="danger-card">
+                <div class="danger-card-inner">
+                    <div>
+                        <h2>Zone de danger</h2>
+                        <p>Supprimer votre compte entraînera la suppression permanente de toutes vos annonces et de vos données.</p>
+                    </div>
+                    <button type="button" class="btn btn-danger btn-pill btn-danger-limited" onclick="document.getElementById('delete-account-modal').style.display='flex'">Supprimer mon compte</button>
+                </div>
+            </section>
+        </div>
     </div>
 </div>
 
