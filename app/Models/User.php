@@ -18,6 +18,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'password',
         'phone_number',
         'role',
+        'avatar',
     ];
 
     protected $hidden = [
@@ -37,6 +38,17 @@ class User extends Authenticatable implements MustVerifyEmail
     public function ads()
     {
         return $this->hasMany(Ad::class);
+    }
+
+    /**
+     * URL accessor for the avatar stored on the public disk.
+     */
+    public function getAvatarUrlAttribute(): ?string
+    {
+        if (! $this->avatar) {
+            return null;
+        }
+        return asset('storage/' . ltrim($this->avatar, '/'));
     }
 
     public function isAdmin(): bool

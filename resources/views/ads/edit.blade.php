@@ -75,7 +75,7 @@
                         <div class="form-group">
                             <label for="location" class="form-label">Localisation <span class="required">*</span></label>
                             <div class="input-wrap">
-                                <svg class="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                                <svg class="input-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
                                 <input type="text" id="location" name="location" value="{{ old('location', $ad->location) }}" class="form-input {{ $errors->has('location') ? 'input-error' : '' }}" required maxlength="100">
                             </div>
                             @error('location') <p class="form-error">{{ $message }}</p> @enderror

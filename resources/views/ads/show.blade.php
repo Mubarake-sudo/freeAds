@@ -35,8 +35,14 @@
                     </div>
                 </div>
 
-                @if($ad->user->phone_number)
-                    <a href="tel:{{ $ad->user->phone_number }}" class="vortex-btn neon full">Contacter le vendeur</a>
+                @php
+                    $sellerPhone = $ad->user->phone_number ? preg_replace('/\s+/', '', $ad->user->phone_number) : null;
+                @endphp
+
+                @if($sellerPhone)
+                    <a href="tel:{{ rawurlencode($sellerPhone) }}" class="vortex-btn neon full">Appeler le vendeur</a>
+                @elseif($ad->user->email)
+                    <a href="mailto:{{ $ad->user->email }}?subject={{ rawurlencode('À propos de votre annonce : ' . $ad->title) }}" class="vortex-btn neon full">Envoyer un email au vendeur</a>
                 @else
                     <a href="{{ route('login') }}" class="vortex-btn ghost full">Connectez-vous pour voir le contact</a>
                 @endif

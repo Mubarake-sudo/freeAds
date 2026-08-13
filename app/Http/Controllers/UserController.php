@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules\Password;
 use Illuminate\View\View;
+use Illuminate\Support\Facades\Storage;
 
 class UserController extends Controller
 {
@@ -39,16 +40,31 @@ class UserController extends Controller
         $request->validate([
             'login'        => ['required', 'string', 'min:3', 'max:50', 'unique:users,login,' . $user->id, 'regex:/^[a-zA-Z0-9_\-]+$/'],
             'phone_number' => ['nullable', 'string', 'max:20'],
+            'avatar'       => ['nullable', 'image', 'max:5120'],
         ], [
             'login.required' => 'Le pseudo est obligatoire.',
             'login.unique'   => 'Ce pseudo est déjà utilisé.',
             'login.regex'    => 'Le pseudo ne peut contenir que des lettres, chiffres, tirets et underscores.',
         ]);
 
-        $user->update([
+        $data = [
             'login'        => $request->login,
             'phone_number' => $request->phone_number,
-        ]);
+        ];
+
+        if ($request->hasFile('avatar')) {
+            $file = $request->file('avatar');
+            $path = $file->store('avatars', 'public');
+
+            // delete old avatar if any
+            if ($user->avatar) {
+                Storage::disk('public')->delete($user->avatar);
+            }
+
+            $data['avatar'] = $path;
+        }
+
+        $user->update($data);
 
         return redirect()->route('profile')
             ->with('success', 'Profil mis à jour avec succès !');

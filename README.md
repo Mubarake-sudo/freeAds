@@ -1,10 +1,12 @@
 # VORTEX — Petites annonces premium en Laravel 11
 
-VORTEX est une plateforme de petites annonces premium, pensée pour un rendu dark mode très haut de gamme inspiré du streetwear / fashion minimal. La plateforme permet à un client de publier une annonce, de filtrer les résultats, de consulter le détail d’un produit et de gérer son profil.
+VORTEX est une plateforme de petites annonces premium pensée pour un rendu sombre, premium et moderne. Elle permet à un utilisateur de publier, consulter, filtrer et gérer des annonces en toute simplicité.
+
+Ce projet est conçu pour fonctionner en local puis être déployé facilement sur Railway, avec une base MySQL et un front Laravel + Vite.
 
 ## 1. Prérequis
 
-Avant de commencer, assurez-vous d’avoir installé sur votre machine :
+Avant de démarrer, vérifiez que vous avez bien installé :
 
 - PHP 8.2+
 - Composer
@@ -13,13 +15,13 @@ Avant de commencer, assurez-vous d’avoir installé sur votre machine :
 - MySQL 8+
 - Git
 
-## 2. Installation rapide
+## 2. Installation locale complète
 
 ### 2.1 Cloner le projet
 
 ```bash
-git clone <url-du-projet>
-cd vortex
+git clone <url-du-repo>
+cd freeAds
 ```
 
 ### 2.2 Installer les dépendances PHP
@@ -34,13 +36,13 @@ composer install
 npm install
 ```
 
-### 2.4 Créer le fichier d’environnement
+### 2.4 Créer le fichier .env
 
 ```bash
 cp .env.example .env
 ```
 
-Ensuite, configurez votre base MySQL dans le fichier [.env](.env) :
+Puis configurez votre base de données dans [.env](.env) :
 
 ```env
 APP_NAME=VORTEX
@@ -63,9 +65,9 @@ DB_PASSWORD=
 php artisan key:generate
 ```
 
-### 2.6 Créer la base de données MySQL
+### 2.6 Créer la base MySQL
 
-Dans MySQL :
+Dans MySQL ou MariaDB :
 
 ```sql
 CREATE DATABASE vortex;
@@ -77,70 +79,115 @@ CREATE DATABASE vortex;
 php artisan migrate --seed
 ```
 
-Cela crée :
+Cela va créer :
 
 - la table `users`
 - la table `ads`
 - les comptes de démonstration
-- 8 annonces d’exemple en français
+- plusieurs annonces d’exemple
 
-### 2.8 Lancer le serveur Laravel
+### 2.8 Démarrer le serveur Laravel
 
 ```bash
 php artisan serve
 ```
 
-Ensuite ouvrez :
+Ouvrez ensuite :
 
 ```txt
 http://127.0.0.1:8000
 ```
 
-### 2.9 Compiler le CSS/JS frontend
+### 2.9 Compiler le frontend
+
+Pendant le développement :
 
 ```bash
 npm run dev
 ```
 
-Ou pour la version build de production :
+En production :
 
 ```bash
 npm run build
 ```
 
-## 3. Architecture utilisateur : client vs admin
+---
+
+## 3. Vérifier le nombre d’inscrits dans la base
+
+### Option A — via SQL
+
+```sql
+SELECT COUNT(*) AS total_users FROM users;
+```
+
+### Option B — via Laravel
+
+```bash
+php artisan tinker --execute="echo App\\Models\\User::count();"
+```
+
+### Option C — compter par rôle
+
+```sql
+SELECT role, COUNT(*) AS total FROM users GROUP BY role;
+```
+
+---
+
+## 4. Hacher les mots de passe correctement
+
+Laravel utilise le hachage automatique via la propriété `password` castée en `hashed` dans [app/Models/User.php](app/Models/User.php).
+
+### Exemple de hash manuel
+
+```bash
+php artisan tinker --execute="echo Illuminate\\Support\\Facades\\Hash::make('password123');"
+```
+
+### Vérifier un mot de passe
+
+```bash
+php artisan tinker --execute="echo Illuminate\\Support\\Facades\\Hash::check('password123', App\\Models\\User::first()->password) ? 'OK' : 'KO';"
+```
+
+> Important : ne jamais stocker les mots de passe en clair dans la base de données.
+
+---
+
+## 5. Architecture utilisateur : client vs admin
 
 Le modèle `User` contient un champ `role` avec deux valeurs possibles :
 
 - `client`
 - `admin`
 
-### 3.1 Rôle client
+### 5.1 Rôle client
 Un client peut :
 
 - s’inscrire
 - se connecter
-- créer une annonce
+- publier une annonce
 - modifier ou supprimer ses propres annonces
-- consulter son profil
+- gérer son profil
 
-### 3.2 Rôle admin
+### 5.2 Rôle admin
 Un admin peut :
 
-- gérer toutes les annonces
-- voir toutes les données utilisateurs
-- modifier ou supprimer des contenus si nécessaire
-- gérer la plateforme en backend
+- consulter toutes les annonces
+- gérer les contenus
+- superviser la plateforme
 
-### 3.3 Promouvoir un utilisateur en admin
+### 5.3 Promouvoir un utilisateur en admin
 
-#### Option A — via MySQL directement
+#### Option SQL
 
 ```sql
 UPDATE users SET role = 'admin' WHERE email = 'admin@vortex.com';
 ```
 
-#### Option B — via un seeder
+#### Option Laravel / seeder
 
 ```php
 User::create([
@@ -152,29 +199,21 @@ User::create([
 ]);
 ```
 
-Dans cette application, l’admin de démonstration est déjà créé par [database/seeders/DatabaseSeeder.php](database/seeders/DatabaseSeeder.php).
+---
 
-## 4. Comment fonctionne la publication d’une annonce
+## 6. Publier et gérer une annonce
 
-### 4.1 En tant que client
+### 6.1 Processus client
 
-1. L’utilisateur s’inscrit via la page d’inscription.
-2. Il valide son email si le système de vérification est activé.
+1. L’utilisateur s’inscrit.
+2. Il vérifie son email si la vérification est activée.
 3. Il se connecte.
-4. Il clique sur le bouton `Poster une annonce`.
-5. Il remplit le formulaire :
-   - titre
-   - catégorie
-   - description
-   - prix
-   - ville / localisation
-   - état du produit
-   - photo
-6. Laravel valide les données puis les sauvegarde dans la table `ads`.
+4. Il clique sur `Poster une annonce`.
+5. Il remplit le formulaire.
+6. La photo est téléchargée et stockée dans le dossier `storage/app/public/ads`.
+7. L’annonce est enregistrée dans la table `ads`.
 
-### 4.2 Mapping avec MySQL
-
-Le formulaire crée une ligne dans la table `ads` comme ceci :
+### 6.2 Structure de la table `ads`
 
 | Colonne | Exemple |
 |---|---|
@@ -185,45 +224,115 @@ Le formulaire crée une ligne dans la table `ads` comme ceci :
 | price | 250000 |
 | location | Abidjan |
 | condition | new |
-| photo | url image |
+| photo | ads/abc123.png |
 
-La clé étrangère `user_id` relie l’annonce à l’utilisateur qui l’a créée.
+---
 
-## 5. Architecture de la base de données
+## 7. Déploiement sur Railway (méthode simple et rapide)
 
-### 5.1 Table `users`
+Railway est un bon choix pour un projet Laravel de petite ou moyenne taille, car il est simple à configurer et très accessible aux débutants.
 
-La table `users` contient les données de compte :
+### Étape 1 — Préparer le dépôt GitHub
 
-- `id`
-- `login`
-- `name`
-- `email`
-- `email_verified_at`
-- `password`
-- `phone_number`
-- `role`
-- `remember_token`
-- `created_at`
-- `updated_at`
+1. Créez un dépôt GitHub pour le projet.
+2. Poussez le code local :
 
-### 5.2 Table `ads`
+```bash
+git add .
+git commit -m "Initial commit"
+git push origin main
+```
 
-La table `ads` contient les annonces :
+### Étape 2 — Créer un compte Railway
 
-- `id`
-- `user_id`
-- `title`
-- `category`
-- `description`
-- `price`
-- `location`
-- `condition`
-- `photo`
-- `created_at`
-- `updated_at`
+1. Allez sur https://railway.app
+2. Connectez-vous avec GitHub
+3. Cliquez sur `New Project`
+4. Choisissez `Deploy from GitHub repo`
+5. Sélectionnez votre dépôt
 
-## 6. Points clés du code
+### Étape 3 — Ajouter une base MySQL
+
+1. Dans Railway, cliquez sur `New` puis `Database`
+2. Choisissez `MySQL`
+3. Attendez la création de la base
+4. Notez les variables d’environnement fournies automatiquement :
+   - `MYSQLHOST`
+   - `MYSQLPORT`
+   - `MYSQLDATABASE`
+   - `MYSQLUSER`
+   - `MYSQLPASSWORD`
+
+### Étape 4 — Configurer les variables d’environnement Laravel
+
+Dans Railway, ouvrez votre service application puis `Variables` et ajoutez :
+
+```env
+APP_NAME=VORTEX
+APP_ENV=production
+APP_DEBUG=false
+APP_URL=https://<votre-domaine-railway>.up.railway.app
+
+DB_CONNECTION=mysql
+DB_HOST=<MYSQLHOST>
+DB_PORT=3306
+DB_DATABASE=<MYSQLDATABASE>
+DB_USERNAME=<MYSQLUSER>
+DB_PASSWORD=<MYSQLPASSWORD>
+
+CACHE_DRIVER=file
+SESSION_DRIVER=file
+QUEUE_CONNECTION=sync
+```
+
+### Étape 5 — Définir la commande de démarrage
+
+Dans Railway, dans le service de l’application, ajoutez :
+
+```bash
+php artisan serve --host 0.0.0.0 --port $PORT
+```
+
+### Étape 6 — Installer les dépendances et compiler le frontend
+
+Railway va automatiquement installer Composer et Node.js pour le build. Si nécessaire, configurez la commande de build (ou laissez le comportement par défaut du framework) :
+
+```bash
+composer install --no-interaction --prefer-dist --optimize-autoloader
+npm install
+npm run build
+```
+
+### Étape 7 — Exécuter les migrations sur Railway
+
+Dans le terminal Railway ou via la console de commande :
+
+```bash
+php artisan migrate --seed
+```
+
+### Étape 8 — Vérifier le site
+
+Une fois le déploiement terminé, ouvrez l’URL fournie par Railway.
+
+Votre site est alors accessible en ligne avec la base MySQL connectée.
+
+> Remarque : pour un déploiement plus robuste, il est conseillé d’ajouter Plusieurs variables d’environnement et de configurer un domaine personnalisé plus tard.
+
+---
+
+## 8. Contact vendeur / acheteur
+
+Le projet inclut désormais le contact avec le vendeur via :
+
+- appel téléphonique si le vendeur a sa `phone_number`
+- e-mail si le téléphone n’est pas renseigné
+
+Cela est géré dans [resources/views/ads/show.blade.php](resources/views/ads/show.blade.php).
+
+---
+
+## 9. Points clés du code
 
 ### Modèle utilisateur
 - [app/Models/User.php](app/Models/User.php)
@@ -234,6 +343,9 @@ La table `ads` contient les annonces :
 ### Contrôleur annonces
 - [app/Http/Controllers/AdController.php](app/Http/Controllers/AdController.php)
 
+### Contrôleur utilisateur
+- [app/Http/Controllers/UserController.php](app/Http/Controllers/UserController.php)
+
 ### Routes du site
 - [routes/web.php](routes/web.php)
 
@@ -243,21 +355,47 @@ La table `ads` contient les annonces :
 ### Layout principal
 - [resources/views/layouts/app.blade.php](resources/views/layouts/app.blade.php)
 
-## 7. Commandes utiles
+---
+
+## 10. Commandes utiles
 
 ```bash
 php artisan migrate
 php artisan migrate:fresh --seed
 php artisan route:list
-php artisan make:model Ad -m
-php artisan make:controller AdController
+php artisan test
 php artisan serve
 npm run dev
+npm run build
 ```
 
-## 8. Bonnes pratiques du projet
+---
+
+## 11. Bonnes pratiques
 
 - Ne jamais stocker les mots de passe en clair.
+- Toujours valider les entrées utilisateur.
+- Vérifier les images avant de les enregistrer.
+- Privilégier des messages flash courts et lisibles.
+- Tester régulièrement le site après chaque changement visuel ou fonctionnel.
+
+---
+
+## 12. Résumé rapide
+
+Cette application est prête pour :
+
+- le développement local
+- la démonstration client
+- l’hébergement simple sur Railway
+- la publication d’annonces premium en dark mode
+
+Si vous voulez aller plus loin, vous pouvez ensuite ajouter :
+
+- une vraie messagerie interne
+- filtres avancés par ville et budget
+- gestion admin backend
+- paiement ou réservation de produits
 - Vérifier les emails pour sécuriser la publication d’annonces.
 - Utiliser toujours les `fillable` sur les modèles Eloquent.
 - Vérifier les validations côté serveur avant l’insertion en base.

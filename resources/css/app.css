@@ -76,6 +76,32 @@ main { display: block; }
 }
 
 .vortex-nav {
+
+/* Make form SVG icons thinner and properly sized */
+.input-icon {
+  width: 20px;
+  height: 20px;
+  min-width: 20px;
+  min-height: 20px;
+  stroke: currentColor;
+  color: var(--muted);
+  /* override inline stroke-width attributes */
+  stroke-width: 1.2;
+  display: inline-block;
+}
+
+/* Backwards-compatible wrapper used in templates */
+.input-wrap {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.input-wrap .input-icon {
+  color: var(--muted);
+  width: 20px;
+  height: 20px;
+  stroke-width: 1.2;
+}
   display: flex;
   align-items: center;
   gap: 28px;
@@ -538,6 +564,41 @@ main { display: block; }
   font-weight: 800;
 }
 
+/* Avatar used on profile edit and header */
+.user-avatar {
+  display: inline-grid;
+  place-items: center;
+  width: 68px;
+  height: 68px;
+  border-radius: 50%;
+  background: var(--neon);
+  color: #0a0a0a;
+  font-size: 1.8rem;
+  font-weight: 800;
+}
+.user-avatar.user-avatar-lg {
+  width: 120px;
+  height: 120px;
+  font-size: 3rem;
+}
+
+/* Images in edit forms: limit size and keep aspect ratio */
+.current-photo img,
+.current-photo-img,
+.photo-preview {
+  max-width: 320px;
+  width: 100%;
+  height: auto;
+  display: block;
+  border-radius: 6px;
+  object-fit: cover;
+  margin-top: 12px;
+}
+
+.file-upload-area {
+  max-width: 420px;
+}
+
 .profile-tag,
 .section-pretitle {
   display: inline-block;
@@ -957,6 +1018,21 @@ option {
   background: rgba(255,255,255,0.015);
 }
 
+.vortex-file-preview {
+  margin-top: 12px;
+  border: 1px solid var(--line);
+  background: rgba(255,255,255,0.015);
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+.vortex-file-preview img {
+  display: block;
+  width: 100%;
+  max-height: 240px;
+  object-fit: cover;
+}
+
 .vortex-form-actions {
   display: flex;
   justify-content: flex-end;
@@ -1162,10 +1238,18 @@ option {
   border: 1px solid var(--line);
   background: rgba(10,10,10,0.96);
   color: var(--white);
+  box-shadow: 0 16px 40px rgba(0,0,0,0.38);
+  opacity: 1;
+  transition: opacity 0.22s ease, transform 0.22s ease;
 }
 
 .alert-success { border-color: rgba(53,255,134,0.6); }
 .alert-error { border-color: rgba(255, 107, 107, 0.7); }
+
+.alert-fading {
+  opacity: 0;
+  transform: translateY(-6px);
+}
 
 .alert-close {
   border: 0;

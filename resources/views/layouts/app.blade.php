@@ -49,14 +49,14 @@
         <div class="alert alert-success" role="alert" id="flash-success">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
             {{ session('success') }}
-            <button class="alert-close" onclick="this.parentElement.remove()" aria-label="Fermer">×</button>
+            <button class="alert-close" type="button" aria-label="Fermer">×</button>
         </div>
     @endif
     @if(session('error'))
         <div class="alert alert-error" role="alert" id="flash-error">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
             {{ session('error') }}
-            <button class="alert-close" onclick="this.parentElement.remove()" aria-label="Fermer">×</button>
+            <button class="alert-close" type="button" aria-label="Fermer">×</button>
         </div>
     @endif
 

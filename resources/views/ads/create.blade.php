@@ -72,6 +72,9 @@
                 <div class="vortex-field">
                     <label for="photo">Photo</label>
                     <input type="file" id="photo" name="photo" accept="image/jpeg,image/png,image/webp" class="vortex-file-input">
+                    <div class="vortex-file-preview" id="vortex-file-preview" style="display:none;">
+                        <img id="photo-preview" src="" alt="Aperçu de la photo" />
+                    </div>
                     @error('photo') <span class="vortex-error">{{ $message }}</span> @enderror
                 </div>
             </div>
@@ -84,3 +87,33 @@
     </div>
 </div>
 @endsection
+
+@push('scripts')
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const input = document.getElementById('photo');
+        const preview = document.getElementById('photo-preview');
+        const wrapper = document.getElementById('vortex-file-preview');
+
+        if (!input || !preview || !wrapper) {
+            return;
+        }
+
+        input.addEventListener('change', function (event) {
+            const file = event.target.files && event.target.files[0];
+            if (!file) {
+                wrapper.style.display = 'none';
+                preview.src = '';
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = function (loadEvent) {
+                preview.src = loadEvent.target.result;
+                wrapper.style.display = 'block';
+            };
+            reader.readAsDataURL(file);
+        });
+    });
+</script>
+@endpush
