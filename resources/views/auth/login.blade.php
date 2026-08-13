@@ -1,83 +1,58 @@
 @extends('layouts.app')
 
 @section('title', 'Connexion')
-@section('meta_description', 'Connectez-vous à votre compte FreeAds.')
+@section('meta_description', 'Connectez-vous à votre compte VORTEX ADS.')
 
 @section('content')
-<div class="auth-page">
-    <div class="auth-container">
-
-        <div class="auth-card">
-            <div class="auth-header">
-                <div class="auth-logo">
-                    <img src="{{ asset('images/logofreeads.png') }}" alt="FreeAds" class="auth-logo-img">
+<div class="vortex-auth-page">
+    <div class="vortex-auth-shell">
+        <div class="vortex-auth-card">
+            <div class="vortex-auth-header">
+                <div class="vortex-auth-brand" aria-label="VORTEX ADS">
+                    <span class="vortex-brand-word">VORTEX</span>
+                    <span class="vortex-brand-sub">ADS</span>
                 </div>
-                <h1 class="auth-title">Bon retour !</h1>
-                <p class="auth-subtitle">Connectez-vous pour accéder à votre compte</p>
+                <h1>Bon retour</h1>
+                <p>Connectez-vous pour consulter vos annonces et publier votre prochain bien.</p>
             </div>
 
-            <form method="POST" action="{{ route('login') }}" class="auth-form" novalidate id="login-form">
+            <form method="POST" action="{{ route('login') }}" class="vortex-auth-form" novalidate>
                 @csrf
 
-                <div class="form-group">
-                    <label for="email" class="form-label">Email ou Pseudo</label>
-                    <div class="input-wrap">
-                        <svg class="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.58-7 8-7s8 3 8 7"/></svg>
-                        <input
-                            type="text"
-                            id="email"
-                            name="email"
-                            value="{{ old('email') }}"
-                            class="form-input {{ $errors->has('email') ? 'input-error' : '' }}"
-                            placeholder="votre@email.com ou pseudo"
-                            autocomplete="email"
-                            required
-                        >
+                <div class="vortex-field">
+                    <label for="email">Email ou pseudo</label>
+                    <div class="vortex-input-wrap">
+                        <input type="text" id="email" name="email" value="{{ old('email') }}" placeholder="votre@email.com ou pseudo" autocomplete="email" required>
                     </div>
                     @error('email')
-                        <p class="form-error" role="alert">{{ $message }}</p>
+                        <span class="vortex-error">{{ $message }}</span>
                     @enderror
                 </div>
 
-                <div class="form-group">
-                    <div class="form-label-row">
-                        <label for="password" class="form-label">Mot de passe</label>
-                    </div>
-                    <div class="input-wrap">
-                        <svg class="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-                        <input
-                            type="password"
-                            id="password"
-                            name="password"
-                            class="form-input {{ $errors->has('password') ? 'input-error' : '' }}"
-                            placeholder="••••••••"
-                            autocomplete="current-password"
-                            required
-                        >
-                        <button type="button" class="input-toggle-pw" aria-label="Afficher le mot de passe" onclick="togglePassword('password', this)">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-                        </button>
+                <div class="vortex-field">
+                    <label for="password">Mot de passe</label>
+                    <div class="vortex-input-wrap password-wrap">
+                        <input type="password" id="password" name="password" placeholder="••••••••" autocomplete="current-password" required>
+                        <button type="button" class="vortex-toggle-password" aria-label="Afficher le mot de passe" onclick="togglePassword('password', this)">Afficher</button>
                     </div>
                     @error('password')
-                        <p class="form-error" role="alert">{{ $message }}</p>
+                        <span class="vortex-error">{{ $message }}</span>
                     @enderror
                 </div>
 
-                <div class="form-check">
-                    <input type="checkbox" id="remember" name="remember" class="form-checkbox">
-                    <label for="remember" class="form-check-label">Se souvenir de moi</label>
-                </div>
+                <label class="vortex-check-row">
+                    <input type="checkbox" name="remember" id="remember">
+                    <span>Se souvenir de moi</span>
+                </label>
 
-                <button type="submit" class="btn btn-primary btn-block btn-lg" id="login-submit">
-                    Se connecter
-                </button>
+                <button type="submit" class="vortex-btn neon full">Se connecter</button>
             </form>
 
-            <div class="auth-footer">
-                <p>Pas encore de compte ? <a href="{{ route('register') }}" class="auth-link">S'inscrire gratuitement</a></p>
+            <div class="vortex-auth-footer">
+                <span>Pas encore de compte ?</span>
+                <a href="{{ route('register') }}">Créer un compte</a>
             </div>
         </div>
-
     </div>
 </div>
 @endsection
@@ -88,6 +63,7 @@ function togglePassword(fieldId, btn) {
     const field = document.getElementById(fieldId);
     const isHidden = field.type === 'password';
     field.type = isHidden ? 'text' : 'password';
+    btn.textContent = isHidden ? 'Masquer' : 'Afficher';
     btn.setAttribute('aria-label', isHidden ? 'Masquer le mot de passe' : 'Afficher le mot de passe');
 }
 </script>

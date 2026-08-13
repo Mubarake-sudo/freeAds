@@ -11,47 +11,36 @@ class User extends Authenticatable implements MustVerifyEmail
 {
     use HasFactory, Notifiable;
 
-    /**
-     * Les attributs modifiables en masse.
-     * Inclut login et phone_number requis par le cahier des charges.
-     *
-     * @var array<int, string>
-     */
     protected $fillable = [
         'name',
         'login',
         'email',
         'password',
         'phone_number',
+        'role',
     ];
 
-    /**
-     * Les attributs cachés pour la sérialisation.
-     *
-     * @var array<int, string>
-     */
     protected $hidden = [
         'password',
         'remember_token',
     ];
 
-    /**
-     * Les casts d'attributs utilisés par Eloquent.
-     * Le champ is_admin permet de distinguer un compte administrateur.
-     *
-     * @var array<string, string>
-     */
     protected $casts = [
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
-        'is_admin' => 'boolean',
+        'role' => 'string',
     ];
 
-    /**
-     * Un utilisateur possède plusieurs annonces.
-     */
+    public const ROLE_CLIENT = 'client';
+    public const ROLE_ADMIN = 'admin';
+
     public function ads()
     {
         return $this->hasMany(Ad::class);
+    }
+
+    public function isAdmin(): bool
+    {
+        return $this->role === self::ROLE_ADMIN;
     }
 }

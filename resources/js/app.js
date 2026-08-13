@@ -34,3 +34,5 @@ if (userMenuBtn && userDropdown) {
         }
     });
 }
+
+console.log('VORTEX ADS marketplace loaded successfully!');

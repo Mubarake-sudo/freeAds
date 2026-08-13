@@ -72,7 +72,7 @@ class Ad extends Model
             return asset('storage/' . $this->photo);
         }
 
-        return 'https://via.placeholder.com/800x600.png?text=FreeAds+Annonce';
+        return 'https://images.unsplash.com/photo-1524758631624-e2822e304c36?auto=format&fit=crop&w=1200&q=80';
     }
 
     /**

@@ -1,122 +1,286 @@
-# FreeAds
+# VORTEX — Petites annonces premium en Laravel 11
 
-FreeAds est une application Laravel de petites annonces responsive, moderne et entièrement fonctionnelle. Elle permet de créer un compte, se connecter, publier des annonces, rechercher des annonces et consulter les détails d’une annonce.
+VORTEX est une plateforme de petites annonces premium, pensée pour un rendu dark mode très haut de gamme inspiré du streetwear / fashion minimal. La plateforme permet à un client de publier une annonce, de filtrer les résultats, de consulter le détail d’un produit et de gérer son profil.
 
-## Ce qui a été livré
+## 1. Prérequis
 
-- Système d’authentification complet : inscription, connexion, déconnexion.
-- Modèle utilisateur avec champs login, email, mot de passe, téléphone.
-- Système de publication d’annonces avec formulaire complet.
-- Page d’accueil principale avec grille d’annonces, recherche et filtres.
-- Pages de détail, édition et suppression d’annonces.
-- Design moderne, responsive et cohérent sur desktop et mobile.
-- Footer SEO-friendly et pages d’authentification stylisées.
-- Tests de régression pour l’inscription.
+Avant de commencer, assurez-vous d’avoir installé sur votre machine :
 
-## Fonctionnalités principales
-
-### 1. Profil utilisateur
-- Création d’un utilisateur via le modèle Eloquent.
-- Champs obligatoires ou optionnels : login, email, mot de passe, téléphone.
-- Authentification avec email ou pseudo.
-
-### 2. Système d’annonces
-- Publication d’une annonce avec :
-  - titre
-  - catégorie
-  - description
-  - photo
-  - prix
-  - localisation
-  - état / condition
-- Affichage de toutes les annonces sur la page d’accueil.
-- Affichage du détail d’une annonce.
-- Modification et suppression de ses propres annonces.
-
-### 3. Recherche et filtres
-- Barre de recherche par mots-clés.
-- Filtres par catégorie, localisation, prix et condition.
-
-### 4. Améliorations UI/UX
-- Interface moderne inspirée d’un marché en ligne.
-- Layout principal avec header, footer et menu mobile.
-- Pages de connexion/inscription refaites complètement.
-- Cartes d’annonces avec images cadrées et mise en page propre.
-
-### 5. Qualité et tests
-- Test de régression pour valider l’inscription utilisateur.
-- Vérification de l’intégration du layout et des assets Vite.
-
-## Structure du projet
-
-- [routes/web.php](routes/web.php) : routes publiques, d’authentification et des annonces.
-- [app/Http/Controllers/AdController.php](app/Http/Controllers/AdController.php) : logique CRUD et filtres.
-- [app/Models/Ad.php](app/Models/Ad.php) : modèle annonce.
-- [app/Models/User.php](app/Models/User.php) : modèle utilisateur.
-- [resources/views/welcome.blade.php](resources/views/welcome.blade.php) : page d’accueil principale.
-- [resources/views/layouts/app.blade.php](resources/views/layouts/app.blade.php) : layout global.
-- [resources/views/auth/login.blade.php](resources/views/auth/login.blade.php) : connexion.
-- [resources/views/auth/register.blade.php](resources/views/auth/register.blade.php) : inscription.
-- [resources/css/app.css](resources/css/app.css) : styles principaux.
-- [resources/js/app.js](resources/js/app.js) : scripts frontend.
-
-## Installation
-
-### Prérequis
-- PHP 8.1+
+- PHP 8.2+
 - Composer
 - Node.js 18+
 - npm
-- Base de données MySQL / MariaDB / SQLite
+- MySQL 8+
+- Git
 
-### Étapes
+## 2. Installation rapide
+
+### 2.1 Cloner le projet
+
+```bash
+git clone <url-du-projet>
+cd vortex
+```
+
+### 2.2 Installer les dépendances PHP
 
 ```bash
 composer install
-npm install
-cp .env.example .env
-php artisan key:generate
-php artisan migrate --seed
-php artisan storage:link
-npm run build
-php artisan serve
 ```
 
-### Configuration base de données
+### 2.3 Installer les dépendances frontend
 
-Dans le fichier [.env](.env), configurez votre connexion :
+```bash
+npm install
+```
+
+### 2.4 Créer le fichier d’environnement
+
+```bash
+cp .env.example .env
+```
+
+Ensuite, configurez votre base MySQL dans le fichier [.env](.env) :
 
 ```env
+APP_NAME=VORTEX
+APP_ENV=local
+APP_KEY=
+APP_DEBUG=true
+APP_URL=http://127.0.0.1:8000
+
 DB_CONNECTION=mysql
 DB_HOST=127.0.0.1
 DB_PORT=3306
-DB_DATABASE=freeads
+DB_DATABASE=vortex
 DB_USERNAME=root
 DB_PASSWORD=
 ```
 
-## Utilisation
+### 2.5 Générer la clé Laravel
 
-- Page d’accueil : /
-- Inscription : /inscription
-- Connexion : /connexion
-- Déconnexion : /deconnexion
-- Publier une annonce : /annonces/creer
-- Détail d’une annonce : /annonces/{id}
+```bash
+php artisan key:generate
+```
 
-## Données de démonstration
+### 2.6 Créer la base de données MySQL
 
-Le seeder crée des utilisateurs et des annonces de démonstration afin de visualiser rapidement le site.
+Dans MySQL :
 
-## Vérifications faites
+```sql
+CREATE DATABASE vortex;
+```
 
-- Vérification du flux d’inscription et de connexion.
-- Vérification de l’accès à la page de publication après authentification.
-- Vérification du build Vite.
-- Test de régression ajouté pour l’inscription.
+### 2.7 Lancer les migrations et les seeders
 
-## Notes importantes
+```bash
+php artisan migrate --seed
+```
 
-- La page de publication est accessible dès qu’un utilisateur est connecté.
-- L’application a été adaptée pour éviter les blocages visibles après inscription ou connexion.
-- L’interface a été modernisée pour une meilleure expérience utilisateur.
+Cela crée :
+
+- la table `users`
+- la table `ads`
+- les comptes de démonstration
+- 8 annonces d’exemple en français
+
+### 2.8 Lancer le serveur Laravel
+
+```bash
+php artisan serve
+```
+
+Ensuite ouvrez :
+
+```txt
+http://127.0.0.1:8000
+```
+
+### 2.9 Compiler le CSS/JS frontend
+
+```bash
+npm run dev
+```
+
+Ou pour la version build de production :
+
+```bash
+npm run build
+```
+
+## 3. Architecture utilisateur : client vs admin
+
+Le modèle `User` contient un champ `role` avec deux valeurs possibles :
+
+- `client`
+- `admin`
+
+### 3.1 Rôle client
+Un client peut :
+
+- s’inscrire
+- se connecter
+- créer une annonce
+- modifier ou supprimer ses propres annonces
+- consulter son profil
+
+### 3.2 Rôle admin
+Un admin peut :
+
+- gérer toutes les annonces
+- voir toutes les données utilisateurs
+- modifier ou supprimer des contenus si nécessaire
+- gérer la plateforme en backend
+
+### 3.3 Promouvoir un utilisateur en admin
+
+#### Option A — via MySQL directement
+
+```sql
+UPDATE users SET role = 'admin' WHERE email = 'admin@vortex.com';
+```
+
+#### Option B — via un seeder
+
+```php
+User::create([
+    'login' => 'admin',
+    'name' => 'Admin VORTEX',
+    'email' => 'admin@vortex.com',
+    'password' => Hash::make('password123'),
+    'role' => 'admin',
+]);
+```
+
+Dans cette application, l’admin de démonstration est déjà créé par [database/seeders/DatabaseSeeder.php](database/seeders/DatabaseSeeder.php).
+
+## 4. Comment fonctionne la publication d’une annonce
+
+### 4.1 En tant que client
+
+1. L’utilisateur s’inscrit via la page d’inscription.
+2. Il valide son email si le système de vérification est activé.
+3. Il se connecte.
+4. Il clique sur le bouton `Poster une annonce`.
+5. Il remplit le formulaire :
+   - titre
+   - catégorie
+   - description
+   - prix
+   - ville / localisation
+   - état du produit
+   - photo
+6. Laravel valide les données puis les sauvegarde dans la table `ads`.
+
+### 4.2 Mapping avec MySQL
+
+Le formulaire crée une ligne dans la table `ads` comme ceci :
+
+| Colonne | Exemple |
+|---|---|
+| user_id | 3 |
+| title | Nintendo Switch OLED |
+| category | Jeux vidéo |
+| description | Console ... |
+| price | 250000 |
+| location | Abidjan |
+| condition | new |
+| photo | url image |
+
+La clé étrangère `user_id` relie l’annonce à l’utilisateur qui l’a créée.
+
+## 5. Architecture de la base de données
+
+### 5.1 Table `users`
+
+La table `users` contient les données de compte :
+
+- `id`
+- `login`
+- `name`
+- `email`
+- `email_verified_at`
+- `password`
+- `phone_number`
+- `role`
+- `remember_token`
+- `created_at`
+- `updated_at`
+
+### 5.2 Table `ads`
+
+La table `ads` contient les annonces :
+
+- `id`
+- `user_id`
+- `title`
+- `category`
+- `description`
+- `price`
+- `location`
+- `condition`
+- `photo`
+- `created_at`
+- `updated_at`
+
+## 6. Points clés du code
+
+### Modèle utilisateur
+- [app/Models/User.php](app/Models/User.php)
+
+### Modèle annonce
+- [app/Models/Ad.php](app/Models/Ad.php)
+
+### Contrôleur annonces
+- [app/Http/Controllers/AdController.php](app/Http/Controllers/AdController.php)
+
+### Routes du site
+- [routes/web.php](routes/web.php)
+
+### Page d’accueil
+- [resources/views/welcome.blade.php](resources/views/welcome.blade.php)
+
+### Layout principal
+- [resources/views/layouts/app.blade.php](resources/views/layouts/app.blade.php)
+
+## 7. Commandes utiles
+
+```bash
+php artisan migrate
+php artisan migrate:fresh --seed
+php artisan route:list
+php artisan make:model Ad -m
+php artisan make:controller AdController
+php artisan serve
+npm run dev
+```
+
+## 8. Bonnes pratiques du projet
+
+- Ne jamais stocker les mots de passe en clair.
+- Vérifier les emails pour sécuriser la publication d’annonces.
+- Utiliser toujours les `fillable` sur les modèles Eloquent.
+- Vérifier les validations côté serveur avant l’insertion en base.
+- Rester cohérent entre le rôle, le profil et les permissions.
+
+## 9. Résumé
+
+VORTEX est une plateforme de petites annonces premium avec :
+
+- design dark mode premium
+- contenu en français
+- gestion utilisateur claire
+- système d’annonces complet
+- filtres et recherche avancés
+- architecture Laravel 11 propre et évolutive
+
+## 10. Support
+
+Pour toute modification, démarrez par :
+
+```bash
+php artisan route:list
+php artisan tinker
+```
+
+et vérifiez votre base de données MySQL pour confirmer les valeurs `role`, `user_id` et `category`.
