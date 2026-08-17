@@ -1,5 +1,8 @@
 FROM dunglas/frankenphp:php8.4-bookworm
 
+COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+
+
 WORKDIR /srv/app
 
 # Copy project files
