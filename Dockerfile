@@ -25,6 +25,5 @@ RUN if [ -f package.json ]; then npm install && npm run build || true; fi
 RUN php artisan key:generate --force || true
 
 EXPOSE 8080
-
-# Run migrations then start the built-in server on the container port
-CMD ["sh", "-lc", "php artisan migrate --force || true && php artisan serve --host=0.0.0.0 --port=${PORT:-8080}"]
+# Run migrations then start FrankenPHP (let the base image handle the HTTP server)
+CMD ["sh", "-lc", "php artisan migrate --force --seed || true && frankenphp run --config /etc/caddy/Caddyfile"]
